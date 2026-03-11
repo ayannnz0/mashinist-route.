@@ -1,1 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Маршрут машиниста</title>
 
+<style>
+
+body{
+font-family: Arial;
+background:#eef2f5;
+margin:0;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+}
+
+input, textarea{
+width:100%;
+padding:10px;
+margin:6px 0;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#1565C0;
+color:white;
+border:none;
+border-radius:6px;
+margin-top:5px;
+}
+
+.card{
+background:white;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stats{
+background:#fff;
+padding:10px;
+margin-bottom:10px;
+border-radius:10px;
+}
+
+.delete{
+background:#c62828;
+margin-top:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Маршрут машиниста</h1>
+
+<div class="stats" id="stats"></div>
+
+<input id="train" placeholder="Номер поезда">
+<input id="from" placeholder="Станция отправления">
+<input id="to" placeholder="Станция прибытия">
+<input id="loco" placeholder="Локомотив">
+<input id="weight" placeholder="Вес поезда">
+<input id="axles" placeholder="Оси">
+<input id="km" placeholder="Километры">
+<input id="time" placeholder="Рабочее время (часы)">
+<textarea id="notes" placeholder="Заметки"></textarea>
+
+<button onclick="addRoute()">Добавить маршрут</button>
+
+<div id="routes"></div>
+
+</div>
+
+<script>
+
+let routes = JSON.parse(localStorage.getItem("routes")) || []
+
+function addRoute(){
+
+let route = {
+train:train.value,
+from:from.value,
+to:to.value,
+loco:loco.value,
+weight:weight.value,
+axles:axles.value,
+km:Number(km.value),
+time:Number(time.value),
+notes:notes.value
+}
+
+routes.push(route)
+
+save()
+
+}
+
+function deleteRoute(index){
+
+routes.splice(index,1)
+
+save()
+
+}
+
+function save(){
+
+localStorage.setItem("routes",JSON.stringify(routes))
+
+render()
+
+}
+
+function render(){
+
+let list = document.getElementById("routes")
+
+list.innerHTML=""
+
+let totalKm=0
+let totalTime=0
+
+routes.forEach((r,i)=>{
+
+totalKm+=r.km||0
+totalTime+=r.time||0
+
+list.innerHTML+=`
+<div class="card">
+<b>Поезд ${r.train}</b><br>
+${r.from} → ${r.to}<br>
+Локомотив: ${r.loco}<br>
+Вес: ${r.weight}<br>
+Оси: ${r.axles}<br>
+Км: ${r.km}<br>
+Время: ${r.time} ч<br>
+<button class="delete" onclick="deleteRoute(${i})">Удалить</button>
+</div>
+`
+
+})
+
+document.getElementById("stats").innerHTML=
+`
+Поездок: ${routes.length}<br>
+Километров: ${totalKm}<br>
+Часов работы: ${totalTime}
+`
+
+}
+
+render()
+
+</script>
+
+</body>
+</html>
